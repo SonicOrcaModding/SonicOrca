@@ -40,12 +40,6 @@
       <HintPath>lib\Accord.Video.FFMPEG.x64.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="SonicOrca.Common">
-      <HintPath>lib\SonicOrca.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="SonicOrca.Resources">
-      <HintPath>lib\SonicOrca.Resources.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -452,6 +446,16 @@
     <Compile Include="csogg\StreamState.cs" />
     <Compile Include="csogg\SyncState.cs" />
     <Compile Include="AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="SonicOrca.Common\SonicOrca.Common.csproj">
+      <Project>{3c8278aa-3d64-414f-92a9-6334cf741eb2}</Project>
+      <Name>SonicOrca.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="SonicOrca.Resources\SonicOrca.Resources.csproj">
+      <Project>{4280aadb-980e-41e1-bd06-f56350e9e93b}</Project>
+      <Name>SonicOrca.Resources</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
