@@ -40,7 +40,7 @@ namespace SonicOrca.Graphics
 
       public Font.CharacterDefinition this[char key]
       {
-        get => this._characterDefinitions.GetValueOrDefault<char, Font.CharacterDefinition>(key);
+        get => DictionaryExtensions.GetValueOrDefault<char, Font.CharacterDefinition>(this._characterDefinitions, key);
       }
 
       public Font(

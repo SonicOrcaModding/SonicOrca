@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>SonicOrca</AssemblyName>
     <LangVersion>12</LangVersion>
     <Nullable>disable</Nullable>
@@ -16,13 +16,8 @@
     <OutputPath>bin\x86\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Accord" Version="3.8.0" />
-    <PackageReference Include="Accord.Video" Version="3.8.0" />
-    <PackageReference Include="Accord.Video.FFMPEG" Version="3.8.0" Condition="'$(Platform)' == 'x86'" />
-    <PackageReference Include="Accord.Video.FFMPEG.x64" Version="3.8.0" Condition="'$(Platform)' != 'x86'" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.CodeDom" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SonicOrca.Common\SonicOrca.Common.csproj" />

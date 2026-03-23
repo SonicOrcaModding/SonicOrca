@@ -40,6 +40,7 @@ namespace SonicOrca
 
       public void Save(string path)
       {
+        this._path = path;
         using (StreamWriter streamWriter = new StreamWriter((Stream) new FileStream(path, FileMode.Create, FileAccess.Write)))
         {
           foreach (string line in this._lines)

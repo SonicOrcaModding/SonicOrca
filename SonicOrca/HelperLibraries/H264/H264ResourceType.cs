@@ -32,7 +32,7 @@ namespace SonicOrca.HelperLibraries.H264
       {
         return await Task.Run<ILoadedResource>((Func<ILoadedResource>) (() =>
         {
-          return (ILoadedResource) new FilmBuffer(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\credits.film")
+          return (ILoadedResource) new FilmBuffer(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty, "credits.film"))
           {
             Resource = e.Resource
           };
