@@ -6,9 +6,9 @@
 
 using System;
 using System.Collections.Generic;
+using SonicOrca;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 
 namespace SonicOrca.Graphics
@@ -35,7 +35,7 @@ namespace SonicOrca.Graphics
       private static string ParseShaderFileWithIncludes(string path)
       {
         if (!File.Exists(path))
-          path = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), path);
+          path = GamePaths.ResolveContentFile(path);
         StringBuilder stringBuilder = new StringBuilder();
         StreamReader streamReader = new StreamReader(path);
         string str1;
