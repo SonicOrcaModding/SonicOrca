@@ -65,6 +65,14 @@ namespace SonicOrca.Core
         "SONICORCA/OBJECTS/KNUCKLES"
       };
       private const double EarthquakeFadeAmount = 0.011111111111111112;
+#if __ANDROID__
+      private const double TouchDpadXFactor = 48.0 / 320.0;
+      private const double TouchDpadYFactor = 192.0 / 240.0;
+      private const double TouchLeftZoneXFactor = 96.0 / 320.0;
+      private const double TouchBottomZoneYFactor = 144.0 / 240.0;
+      private const double TouchJumpRegionStartFactor = 1.0 - 80.0 / 320.0;
+      private const double TouchPauseSizeFactor = 72.0 / 320.0;
+#endif
       private bool _earthquakeIsCurrentlyActive;
       private double _earthquakeFade;
       private SampleInstance _earthquakeSampleInstance;
@@ -655,6 +663,9 @@ namespace SonicOrca.Core
         this._camera.Draw(renderer);
         if (this.ShowHUD)
           this._hud.Draw(renderer);
+#if __ANDROID__
+        this.DrawTouchControls(renderer);
+#endif
         if (this.StateFlags.HasFlag((Enum) LevelStateFlags.CompletingStage))
           this._completeHud.Draw(renderer);
         if (this.StateFlags.HasFlag((Enum) LevelStateFlags.TimeOver) || this.StateFlags.HasFlag((Enum) LevelStateFlags.GameOver))
@@ -666,6 +677,54 @@ namespace SonicOrca.Core
         this._fadeTransitionRenderer.Opacity = (float) -this._fadeTransition.Opacity;
         this._fadeTransitionRenderer.Render();
       }
+
+#if __ANDROID__
+      private void DrawTouchControls(Renderer renderer)
+      {
+        if (!this.StateFlags.HasFlag((Enum) LevelStateFlags.AllowCharacterControl))
+          return;
+        if (this.StateFlags.HasFlag((Enum) (LevelStateFlags.TitleCardActive | LevelStateFlags.CompletingStage | LevelStateFlags.TimeOver | LevelStateFlags.GameOver | LevelStateFlags.Dead)))
+          return;
+        Rectangle surface = new Rectangle(0.0, 0.0, 1920.0, 1080.0);
+        Rectangle viewport = surface;
+        Vector2i clientSize = this._gameContext.Window.ClientSize;
+        Vector2i aspectRatio = this._gameContext.Window.AspectRatio;
+        if (clientSize.X > 0 && clientSize.Y > 0 && aspectRatio.X > 0 && aspectRatio.Y > 0)
+        {
+          double targetAspect = (double) aspectRatio.X / (double) aspectRatio.Y;
+          double surfaceAspect = (double) clientSize.X / (double) clientSize.Y;
+          if (surfaceAspect > targetAspect)
+          {
+            double width = surface.Height * targetAspect;
+            double x = (surface.Width - width) / 2.0;
+            viewport = new Rectangle(x, 0.0, width, surface.Height);
+          }
+          else if (surfaceAspect < targetAspect)
+          {
+            double height = surface.Width / targetAspect;
+            double y = (surface.Height - height) / 2.0;
+            viewport = new Rectangle(0.0, y, surface.Width, height);
+          }
+        }
+        double leftZoneX = viewport.X + viewport.Width * TouchLeftZoneXFactor;
+        double bottomZoneY = viewport.Y + viewport.Height * TouchBottomZoneYFactor;
+        double jumpZoneX = viewport.X + viewport.Width * TouchJumpRegionStartFactor;
+        double dpadCenterX = viewport.X + viewport.Width * TouchDpadXFactor;
+        double dpadCenterY = viewport.Y + viewport.Height * TouchDpadYFactor;
+        double pauseSize = Math.Min(viewport.Width, viewport.Height) * TouchPauseSizeFactor;
+        I2dRenderer obj = renderer.Get2dRenderer();
+        obj.RenderQuad(new Colour(44, 255, 255, 255), new Rectangle(viewport.X, bottomZoneY, leftZoneX - viewport.X, viewport.Bottom - bottomZoneY));
+        obj.RenderQuad(new Colour(44, 255, 255, 255), new Rectangle(jumpZoneX, bottomZoneY, viewport.Right - jumpZoneX, viewport.Bottom - bottomZoneY));
+        obj.RenderEllipse(new Colour(64, 255, 255, 255), new Vector2(dpadCenterX, dpadCenterY), 60.0, 140.0, 64);
+        obj.RenderLine(new Colour(120, 255, 255, 255), new Vector2(dpadCenterX - 96.0, dpadCenterY), new Vector2(dpadCenterX + 96.0, dpadCenterY), 8.0);
+        obj.RenderLine(new Colour(120, 255, 255, 255), new Vector2(dpadCenterX, dpadCenterY - 96.0), new Vector2(dpadCenterX, dpadCenterY + 96.0), 8.0);
+        obj.RenderEllipse(new Colour(72, 255, 255, 255), new Vector2(jumpZoneX + (viewport.Right - jumpZoneX) * 0.5, bottomZoneY + (viewport.Bottom - bottomZoneY) * 0.5), 80.0, 148.0, 64);
+        Rectangle pauseRect = new Rectangle(viewport.Right - pauseSize - 24.0, viewport.Y + 24.0, pauseSize, pauseSize);
+        obj.RenderEllipse(new Colour(88, 255, 255, 255), pauseRect.Centre, pauseRect.Width * 0.35, pauseRect.Width * 0.5, 48);
+        obj.RenderLine(new Colour(170, 255, 255, 255), new Vector2(pauseRect.Centre.X - pauseRect.Width * 0.12, pauseRect.Centre.Y - pauseRect.Height * 0.16), new Vector2(pauseRect.Centre.X - pauseRect.Width * 0.12, pauseRect.Centre.Y + pauseRect.Height * 0.16), 10.0);
+        obj.RenderLine(new Colour(170, 255, 255, 255), new Vector2(pauseRect.Centre.X + pauseRect.Width * 0.12, pauseRect.Centre.Y - pauseRect.Height * 0.16), new Vector2(pauseRect.Centre.X + pauseRect.Width * 0.12, pauseRect.Centre.Y + pauseRect.Height * 0.16), 10.0);
+      }
+#endif
 
       private void DrawMusicFrequency(Renderer renderer)
       {
