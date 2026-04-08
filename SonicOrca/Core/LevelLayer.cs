@@ -216,7 +216,9 @@ namespace SonicOrca.Core
                     ITileRenderer tileRenderer = renderer.GetTileRenderer();
                     tileRenderer.ClipRectangle = viewport.Destination;
                     tileRenderer.ModelMatrix = modelMatrix;
-                    tileRenderer.Textures = this._map.Level.TileSet.Textures.ToArray<ITexture>();
+                    if (this._cachedTileTextures == null)
+                        this._cachedTileTextures = this._map.Level.TileSet.Textures.ToArray<ITexture>();
+                    tileRenderer.Textures = this._cachedTileTextures;
                     tileRenderer.Filter = viewOptions.Filter;
                     tileRenderer.FilterAmount = viewOptions.FilterAmount;
                     tileRenderer.BeginRender();
@@ -423,6 +425,7 @@ namespace SonicOrca.Core
 
         // Token: 0x04000687 RID: 1671
         private readonly LevelMap _map;
+        private ITexture[] _cachedTileTextures;
 
         // Token: 0x0400068C RID: 1676
         private readonly List<LayerRowDefinition> _layerRowDefinitions = new List<LayerRowDefinition>();

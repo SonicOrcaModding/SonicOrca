@@ -420,9 +420,9 @@ namespace SonicOrca.Core
 
       public void Update()
       {
-        if (this.StateFlags.HasFlag((Enum) LevelStateFlags.Paused))
+        if ((this.StateFlags & LevelStateFlags.Paused) != 0)
           return;
-        if (this.StateFlags.HasFlag((Enum) LevelStateFlags.TitleCardActive))
+        if ((this.StateFlags & LevelStateFlags.TitleCardActive) != 0)
         {
           this._titleCard.Update();
           if (this._titleCard.AllowLevelToStart)
@@ -442,7 +442,7 @@ namespace SonicOrca.Core
             this.Camera.MaxVelocity = new Vector2(0.0, 0.0);
           }
         }
-        if (this.StateFlags.HasFlag((Enum) LevelStateFlags.CompletingStage))
+        if ((this.StateFlags & LevelStateFlags.CompletingStage) != 0)
         {
           if (this._player.Sidekick != null && !this._player.Sidekick.IsAirborne)
             this._player.Sidekick.IsWinning = true;
@@ -466,7 +466,7 @@ namespace SonicOrca.Core
             }
           }
         }
-        if (this.StateFlags.HasFlag((Enum) LevelStateFlags.TimeOver) || this.StateFlags.HasFlag((Enum) LevelStateFlags.GameOver))
+        if ((this.StateFlags & LevelStateFlags.TimeOver) != 0 || (this.StateFlags & LevelStateFlags.GameOver) != 0)
         {
           this._gameOverHud.Update();
           if (this._gameOverHud.Finished)
@@ -479,7 +479,7 @@ namespace SonicOrca.Core
         PlayRecorder.Entry entry = (PlayRecorder.Entry) null;
         if (this._playRecorder.Playing)
           entry = this._playRecorder.GetNextEntry();
-        if (this.StateFlags.HasFlag((Enum) LevelStateFlags.Updating))
+        if ((this.StateFlags & LevelStateFlags.Updating) != 0)
         {
           if (entry != null)
           {
@@ -514,21 +514,21 @@ namespace SonicOrca.Core
             this.StateFlags &= ~LevelStateFlags.Updating;
             this.StateFlags &= ~LevelStateFlags.UpdateTime;
             this.StateFlags |= LevelStateFlags.Dead;
-            if (this.StateFlags.HasFlag((Enum) LevelStateFlags.TimeUp))
+            if ((this.StateFlags & LevelStateFlags.TimeUp) != 0)
               this.StartTimeOverSequence();
             else if (this.Player.Lives == 0)
               this.StartGameOverSequence();
             else
               this.FadeOut(LevelState.Dead);
           }
-          if (this.StateFlags.HasFlag((Enum) LevelStateFlags.WaitingForCharacterToWin))
+          if ((this.StateFlags & LevelStateFlags.WaitingForCharacterToWin) != 0)
             this.CompleteLevel();
           this.UpdateEarthquake();
         }
         else if (this._earthquakeSampleInstance != null)
           this._earthquakeSampleInstance.Stop();
         this._soundManager.Update();
-        if (this.StateFlags.HasFlag((Enum) LevelStateFlags.UpdateTime))
+        if ((this.StateFlags & LevelStateFlags.UpdateTime) != 0)
         {
           if (this.Time >= this.TimeBeforeDeath - 1)
           {
@@ -541,7 +541,7 @@ namespace SonicOrca.Core
             ++this.Time;
         }
         this._debugContext.Update();
-        if (this.StateFlags.HasFlag((Enum) LevelStateFlags.FadingOut))
+        if ((this.StateFlags & LevelStateFlags.FadingOut) != 0)
         {
           this._fadeTransition.Update();
           if (this._fadeTransition.Finished)
@@ -556,7 +556,7 @@ namespace SonicOrca.Core
           this._playRecorder.WriteEntry(new PlayRecorder.Entry()
           {
             Direction = new Vector2(input.Throttle, (double) input.VerticalDirection),
-            Action = input.ABC.HasFlag((Enum) CharacterInputButtonState.Down),
+            Action = (input.ABC & CharacterInputButtonState.Down) != 0,
             Position = this._player.Protagonist.Position,
             LayerIndex = this.Map.Layers.IndexOf(this._player.Protagonist.Layer),
             State = (int) this._player.Protagonist.StateFlags,
@@ -577,7 +577,7 @@ namespace SonicOrca.Core
 
       public void Animate()
       {
-        if (this.StateFlags.HasFlag((Enum) LevelStateFlags.Paused) || !this.StateFlags.HasFlag((Enum) LevelStateFlags.Animating))
+        if ((this.StateFlags & LevelStateFlags.Paused) != 0 || (this.StateFlags & LevelStateFlags.Animating) == 0)
           return;
         if (this.LandscapeAnimating)
           this.TileSet.Animate();
@@ -590,7 +590,7 @@ namespace SonicOrca.Core
 
       public void TogglePause()
       {
-        if (this.StateFlags.HasFlag((Enum) LevelStateFlags.Paused))
+        if ((this.StateFlags & LevelStateFlags.Paused) != 0)
           this.Unpause();
         else
           this.Pause();
@@ -598,7 +598,7 @@ namespace SonicOrca.Core
 
       public void Pause()
       {
-        if (this.StateFlags.HasFlag((Enum) LevelStateFlags.Paused) || (this.StateFlags & (LevelStateFlags.FadingIn | LevelStateFlags.FadingOut | LevelStateFlags.CompletingStage | LevelStateFlags.Restarting | LevelStateFlags.TitleCardActive | LevelStateFlags.Dead | LevelStateFlags.StageCompleted | LevelStateFlags.TimeOver | LevelStateFlags.GameOver | LevelStateFlags.TimeUp)) != (LevelStateFlags) 0)
+        if ((this.StateFlags & LevelStateFlags.Paused) != 0 || (this.StateFlags & (LevelStateFlags.FadingIn | LevelStateFlags.FadingOut | LevelStateFlags.CompletingStage | LevelStateFlags.Restarting | LevelStateFlags.TitleCardActive | LevelStateFlags.Dead | LevelStateFlags.StageCompleted | LevelStateFlags.TimeOver | LevelStateFlags.GameOver | LevelStateFlags.TimeUp)) != (LevelStateFlags) 0)
           return;
         this.StateFlags |= LevelStateFlags.Paused;
         this.SoundManager.PauseAll();
@@ -609,9 +609,9 @@ namespace SonicOrca.Core
 
       public void Unpause()
       {
-        if (!this.StateFlags.HasFlag((Enum) LevelStateFlags.Paused) && !this.StateFlags.HasFlag((Enum) LevelStateFlags.GameOver))
+        if ((this.StateFlags & LevelStateFlags.Paused) == 0 && (this.StateFlags & LevelStateFlags.GameOver) == 0)
           return;
-        if (this.StateFlags.HasFlag((Enum) LevelStateFlags.Paused))
+        if ((this.StateFlags & LevelStateFlags.Paused) != 0)
           this.SoundManager.ResumeAll();
         this.StateFlags &= ~LevelStateFlags.Paused;
         if (this._earthquakeSampleInstance == null || !this._earthquakeIsCurrentlyActive)
@@ -621,7 +621,7 @@ namespace SonicOrca.Core
 
       private void ReadPlayerInput()
       {
-        if (this._gameContext.Console.IsOpen || !this.StateFlags.HasFlag((Enum) LevelStateFlags.AllowCharacterControl))
+        if (this._gameContext.Console.IsOpen || (this.StateFlags & LevelStateFlags.AllowCharacterControl) == 0)
           return;
         Controller controller1 = this._gameContext.Current[this._player.ProtagonistGamepadIndex];
         Controller controller2 = this._gameContext.Pressed[this._player.ProtagonistGamepadIndex];
@@ -666,11 +666,11 @@ namespace SonicOrca.Core
 #if __ANDROID__
         this.DrawTouchControls(renderer);
 #endif
-        if (this.StateFlags.HasFlag((Enum) LevelStateFlags.CompletingStage))
+        if ((this.StateFlags & LevelStateFlags.CompletingStage) != 0)
           this._completeHud.Draw(renderer);
-        if (this.StateFlags.HasFlag((Enum) LevelStateFlags.TimeOver) || this.StateFlags.HasFlag((Enum) LevelStateFlags.GameOver))
+        if ((this.StateFlags & LevelStateFlags.TimeOver) != 0 || (this.StateFlags & LevelStateFlags.GameOver) != 0)
           this._gameOverHud.Draw(renderer);
-        if (this.StateFlags.HasFlag((Enum) LevelStateFlags.TitleCardActive))
+        if ((this.StateFlags & LevelStateFlags.TitleCardActive) != 0)
           this._titleCard.Draw(renderer);
         this.DrawDebugThings(renderer);
         renderer.DeativateRenderer();
@@ -681,9 +681,9 @@ namespace SonicOrca.Core
 #if __ANDROID__
       private void DrawTouchControls(Renderer renderer)
       {
-        if (!this.StateFlags.HasFlag((Enum) LevelStateFlags.AllowCharacterControl))
+        if ((this.StateFlags & LevelStateFlags.AllowCharacterControl) == 0)
           return;
-        if (this.StateFlags.HasFlag((Enum) (LevelStateFlags.TitleCardActive | LevelStateFlags.CompletingStage | LevelStateFlags.TimeOver | LevelStateFlags.GameOver | LevelStateFlags.Dead)))
+        if ((this.StateFlags & (LevelStateFlags.TitleCardActive | LevelStateFlags.CompletingStage | LevelStateFlags.TimeOver | LevelStateFlags.GameOver | LevelStateFlags.Dead)) != 0)
           return;
         Rectangle surface = new Rectangle(0.0, 0.0, 1920.0, 1080.0);
         Rectangle viewport = surface;

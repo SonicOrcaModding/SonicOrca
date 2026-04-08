@@ -27,6 +27,7 @@ namespace SonicOrca.Core
       private readonly HashSet<ObjectEntry> _respawnPrevention = new HashSet<ObjectEntry>();
       private readonly List<Rectanglei> _lifeTimeAreas = new List<Rectanglei>();
       private readonly Level _level;
+      private readonly List<ActiveObject> _drawList = new List<ActiveObject>();
 
       public IReadOnlyCollection<ObjectType> RegisteredTypes
       {
@@ -112,8 +113,16 @@ namespace SonicOrca.Core
         LayerViewOptions viewOptions,
         bool priority)
       {
-        foreach (ActiveObject activeObject in (IEnumerable<ActiveObject>) this._activeObjects.Where<ActiveObject>((Func<ActiveObject, bool>) (activeObject => activeObject.Layer == layer && activeObject.Priority != 0 && !(activeObject.Priority < 0 & priority) && (activeObject.Priority <= 0 || priority))).OrderBy<ActiveObject, int>((Func<ActiveObject, int>) (x => x.Priority)))
-          activeObject.Draw(renderer, viewport, viewOptions);
+        this._drawList.Clear();
+        for (int i = 0; i < this._activeObjects.Count; i++)
+        {
+          ActiveObject ao = this._activeObjects[i];
+          if (ao.Layer == layer && ao.Priority != 0 && !(ao.Priority < 0 & priority) && (ao.Priority <= 0 || priority))
+            this._drawList.Add(ao);
+        }
+        this._drawList.Sort((a, b) => a.Priority.CompareTo(b.Priority));
+        for (int i = 0; i < this._drawList.Count; i++)
+          this._drawList[i].Draw(renderer, viewport, viewOptions);
       }
 
       public void DrawDebugInfo(Renderer renderer)
@@ -355,8 +364,11 @@ namespace SonicOrca.Core
 
       public void RemoveFinishedActiveObjects()
       {
-        foreach (ActiveObject activeObject in this._activeObjects.Where<ActiveObject>((Func<ActiveObject, bool>) (x => x.Finished)).ToArray<ActiveObject>())
-          this.DeactivateObject(activeObject);
+        for (int i = this._activeObjects.Count - 1; i >= 0; i--)
+        {
+          if (this._activeObjects[i].Finished)
+            this.DeactivateObject(this._activeObjects[i]);
+        }
       }
 
       public void RemoveFinishedEntries() => this._objectEntryTable.RemoveFinishedEntries();

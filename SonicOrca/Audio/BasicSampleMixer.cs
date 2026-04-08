@@ -6,26 +6,50 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SonicOrca.Audio
 {
 
     public class BasicSampleMixer : ISampleMixer
     {
+      private byte[] _scratchBuffer;
+      private readonly List<ISampleProvider> _nonMusic = new List<ISampleProvider>();
+      private readonly List<ISampleProvider> _music = new List<ISampleProvider>();
+
       public void Mix(byte[] buffer, int offset, int length, IEnumerable<ISampleProvider> channels)
       {
-        byte[] buffer1 = new byte[length];
-        IEnumerable<ISampleProvider> second = (IEnumerable<ISampleProvider>) channels.OfType<SampleInstance>().Where<SampleInstance>((Func<SampleInstance, bool>) (x => x.Classification == SampleInstanceClassification.Music));
-        foreach (ISampleProvider sampleProvider in (IEnumerable<ISampleProvider>) channels.Except<ISampleProvider>(second).Concat<ISampleProvider>(second).Where<ISampleProvider>((Func<ISampleProvider, bool>) (x => x.Playing)).ToArray<ISampleProvider>())
+        if (_scratchBuffer == null || _scratchBuffer.Length < length)
+          _scratchBuffer = new byte[length];
+
+        _nonMusic.Clear();
+        _music.Clear();
+
+        foreach (var provider in channels)
         {
+          if (!provider.Playing)
+            continue;
+          if (provider is SampleInstance si && si.Classification == SampleInstanceClassification.Music)
+            _music.Add(provider);
+          else
+            _nonMusic.Add(provider);
+        }
+
+        MixList(_nonMusic, buffer, offset, length);
+        MixList(_music, buffer, offset, length);
+      }
+
+      private void MixList(List<ISampleProvider> providers, byte[] buffer, int offset, int length)
+      {
+        for (int i = 0; i < providers.Count; i++)
+        {
+          var sampleProvider = providers[i];
           double calculatedVolume = sampleProvider.CalculatedVolume;
           if (calculatedVolume > 0.0)
           {
-            int num1 = sampleProvider.Read(buffer1, offset, length);
+            int num1 = sampleProvider.Read(_scratchBuffer, offset, length);
             for (int startIndex = 0; startIndex < num1; startIndex += 2)
             {
-              short num2 = this.MixSample(BitConverter.ToInt16(buffer, startIndex), (short) ((double) BitConverter.ToInt16(buffer1, startIndex) * calculatedVolume));
+              short num2 = this.MixSample(BitConverter.ToInt16(buffer, startIndex), (short) ((double) BitConverter.ToInt16(_scratchBuffer, startIndex) * calculatedVolume));
               buffer[startIndex] = (byte) ((uint) num2 & (uint) byte.MaxValue);
               buffer[startIndex + 1] = (byte) ((int) num2 >> 8 & (int) byte.MaxValue);
             }

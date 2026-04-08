@@ -124,7 +124,9 @@ namespace SonicOrca.Audio
         int length = this._sampleInputStream.Read(buffer, offset, count);
         if (length == 0)
           this.Playing = false;
-        this._lastReadBytes = buffer.GetRange<byte>(0, length);
+        if (this._lastReadBytes == null || this._lastReadBytes.Length != length)
+          this._lastReadBytes = new byte[length];
+        Array.Copy(buffer, 0, this._lastReadBytes, 0, length);
         return length;
       }
     }
