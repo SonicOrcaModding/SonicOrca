@@ -723,7 +723,7 @@ namespace SonicOrca.Core
           g.RenderTexture(AndroidTouchControlAssets.DpadBottom, dpadBaseRect);
 
           Vector2 axis = this._gameContext.Input.CurrentState.GamePad[0].LeftAxis;
-          double stickRadius = baseSize * 0.18;
+          double stickRadius = baseSize * 0.28;
           Vector2 stickOffset = new Vector2(axis.X * stickRadius, axis.Y * stickRadius);
           Rectangle dpadTopRect = new Rectangle(
             dpadBaseRect.X + (dpadBaseRect.Width - baseSize * 0.62) / 2.0 + stickOffset.X,
@@ -732,7 +732,7 @@ namespace SonicOrca.Core
             baseSize * 0.62);
           g.RenderTexture(AndroidTouchControlAssets.DpadTop, dpadTopRect);
 
-          double jumpSize = Math.Min(viewport.Width, viewport.Height) * 0.30;
+          double jumpSize = baseSize;
           Vector2 jumpCentre = new Vector2(jumpZoneX + (viewport.Right - jumpZoneX) * 0.5, bottomZoneY + (viewport.Bottom - bottomZoneY) * 0.5);
           Rectangle jumpRect = new Rectangle(jumpCentre.X - jumpSize / 2.0, jumpCentre.Y - jumpSize / 2.0, jumpSize, jumpSize);
           g.RenderTexture(AndroidTouchControlAssets.ButtonMain, jumpRect);

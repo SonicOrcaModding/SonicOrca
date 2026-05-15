@@ -59,7 +59,8 @@ namespace SonicOrca
           else if (keyboard.Keys[81])
             vector2.Y = 1.0;
           if (vector2 == new Vector2())
-            vector2 = !(gamePadInputState.LeftAxis == new Vector2()) ? gamePadInputState.LeftAxis : (Vector2) gamePadInputState.POV;
+            vector2 = (gamePadInputState.POV.X != 0 || gamePadInputState.POV.Y != 0) ? (Vector2)gamePadInputState.POV : gamePadInputState.LeftAxis;
+            //vector2 = !(gamePadInputState.LeftAxis == new Vector2()) ? gamePadInputState.LeftAxis : (Vector2) gamePadInputState.POV;
           this.DirectionLeft = vector2;
           this.Action1 = gamePadInputState.West || gamePadInputState.North;
           this.Action2 = gamePadInputState.South;
@@ -86,7 +87,8 @@ namespace SonicOrca
           else if (keyboard.Keys[14])
             vector2.Y = 1.0;
           if (vector2 == new Vector2())
-            vector2 = !(gamePadInputState.LeftAxis == new Vector2()) ? gamePadInputState.LeftAxis : (Vector2) gamePadInputState.POV;
+            vector2 = (gamePadInputState.POV.X != 0 || gamePadInputState.POV.Y != 0) ? (Vector2)gamePadInputState.POV : gamePadInputState.LeftAxis;
+            //vector2 = !(gamePadInputState.LeftAxis == new Vector2()) ? gamePadInputState.LeftAxis : (Vector2) gamePadInputState.POV;
           this.DirectionLeft = vector2;
           this.Action1 = gamePadInputState.West || gamePadInputState.North;
           this.Action2 = gamePadInputState.South;
