@@ -16,17 +16,19 @@ public static class AndroidTouchControlAssets
     private static bool _started;
     private static Task<RawPixels[]> _decodeTask;
 
-    public const string KEY_DPAD_BOTTOM  = "SONICORCA/MOBILE/DPAD_BOTTOM";
-    public const string KEY_DPAD_TOP     = "SONICORCA/MOBILE/DPAD_TOP";
-    public const string KEY_BUTTON_MAIN  = "SONICORCA/MOBILE/BUTTON_MAIN";
-    public const string KEY_BUTTON_BACK  = "SONICORCA/MOBILE/BUTTON_MAIN";
+    public const string KEY_DPAD_BOTTOM      = "SONICORCA/MOBILE/DPAD_BOTTOM";
+    public const string KEY_DPAD_TOP         = "SONICORCA/MOBILE/DPAD_TOP";
+    public const string KEY_BUTTON_MAIN      = "SONICORCA/MOBILE/BUTTON_MAIN";
+    public const string KEY_BUTTON_MAIN_ALT  = "SONICORCA/MOBILE/BUTTON_MAIN_ALT";
+    public const string KEY_BUTTON_BACK      = "SONICORCA/MOBILE/BUTTON_MAIN";
 
     public static bool Available => _available;
 
-    public static ITexture DpadBottom  { get; private set; }
-    public static ITexture DpadTop     { get; private set; }
-    public static ITexture ButtonMain  { get; private set; }
-    public static ITexture ButtonBack  { get; private set; }
+    public static ITexture DpadBottom    { get; private set; }
+    public static ITexture DpadTop       { get; private set; }
+    public static ITexture ButtonMain    { get; private set; }
+    public static ITexture ButtonMainAlt { get; private set; }
+    public static ITexture ButtonBack    { get; private set; }
 
     private const string LogTag = "S2HD";
 
@@ -73,14 +75,15 @@ public static class AndroidTouchControlAssets
 
         if (!_started)
         {
-            string kDpadBottom = ResolveKey(tree, KEY_DPAD_BOTTOM);
-            string kDpadTop    = ResolveKey(tree, KEY_DPAD_TOP);
-            string kButtonMain = ResolveKey(tree, KEY_BUTTON_MAIN);
-            string kButtonBack = ResolveKey(tree, KEY_BUTTON_BACK);
+            string kDpadBottom    = ResolveKey(tree, KEY_DPAD_BOTTOM);
+            string kDpadTop       = ResolveKey(tree, KEY_DPAD_TOP);
+            string kButtonMain    = ResolveKey(tree, KEY_BUTTON_MAIN);
+            string kButtonMainAlt = ResolveKey(tree, KEY_BUTTON_MAIN_ALT);
+            string kButtonBack    = ResolveKey(tree, KEY_BUTTON_BACK);
 
             Log($"[AndroidTouchControlAssets] Scheduling decode: " +
                 $"bottom={kDpadBottom ?? "null"}, top={kDpadTop ?? "null"}, " +
-                $"main={kButtonMain ?? "null"}, back={kButtonBack ?? "null"}");
+                $"main={kButtonMain ?? "null"}, mainAlt={kButtonMainAlt ?? "null"}, back={kButtonBack ?? "null"}");
 
             if (kDpadBottom == null || kDpadTop == null || kButtonMain == null)
             {
@@ -93,7 +96,7 @@ public static class AndroidTouchControlAssets
             _started = true;
 
             _decodeTask = Task.Run(() =>
-                DecodeAll(tree, kDpadBottom, kDpadTop, kButtonMain, kButtonBack));
+                DecodeAll(tree, kDpadBottom, kDpadTop, kButtonMain, kButtonMainAlt, kButtonBack));
 
             return;
         }
@@ -115,11 +118,14 @@ public static class AndroidTouchControlAssets
             RawPixels[] px  = _decodeTask.Result;
             var ctx         = gameContext.Window.GraphicsContext;
 
-            DpadBottom  = ctx.CreateTexture(px[0].Width, px[0].Height, px[0].Channels, px[0].Data);
-            DpadTop     = ctx.CreateTexture(px[1].Width, px[1].Height, px[1].Channels, px[1].Data);
-            ButtonMain  = ctx.CreateTexture(px[2].Width, px[2].Height, px[2].Channels, px[2].Data);
-            ButtonBack  = px[3].Data != null
+            DpadBottom    = ctx.CreateTexture(px[0].Width, px[0].Height, px[0].Channels, px[0].Data);
+            DpadTop       = ctx.CreateTexture(px[1].Width, px[1].Height, px[1].Channels, px[1].Data);
+            ButtonMain    = ctx.CreateTexture(px[2].Width, px[2].Height, px[2].Channels, px[2].Data);
+            ButtonMainAlt = px[3].Data != null
                 ? ctx.CreateTexture(px[3].Width, px[3].Height, px[3].Channels, px[3].Data)
+                : ButtonMain;
+            ButtonBack    = px[4].Data != null
+                ? ctx.CreateTexture(px[4].Width, px[4].Height, px[4].Channels, px[4].Data)
                 : ButtonMain;
 
             _available = DpadBottom != null && DpadTop != null && ButtonMain != null;
@@ -142,14 +148,15 @@ public static class AndroidTouchControlAssets
 
     private static RawPixels[] DecodeAll(
         ResourceTree tree,
-        string kBottom, string kTop, string kMain, string kBack)
+        string kBottom, string kTop, string kMain, string kMainAlt, string kBack)
     {
         return new[]
         {
             DecodePng(tree, kBottom),
             DecodePng(tree, kTop),
             DecodePng(tree, kMain),
-            kBack != null ? DecodePng(tree, kBack) : default,
+            kMainAlt != null ? DecodePng(tree, kMainAlt) : default,
+            kBack    != null ? DecodePng(tree, kBack)    : default,
         };
     }
 

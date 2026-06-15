@@ -735,7 +735,7 @@ namespace SonicOrca.Core
           double jumpSize = baseSize;
           Vector2 jumpCentre = new Vector2(jumpZoneX + (viewport.Right - jumpZoneX) * 0.5, bottomZoneY + (viewport.Bottom - bottomZoneY) * 0.5);
           Rectangle jumpRect = new Rectangle(jumpCentre.X - jumpSize / 2.0, jumpCentre.Y - jumpSize / 2.0, jumpSize, jumpSize);
-          g.RenderTexture(AndroidTouchControlAssets.ButtonMain, jumpRect);
+          g.RenderTexture(AndroidTouchControlAssets.ButtonMainAlt, jumpRect);
         }
         else
         {
