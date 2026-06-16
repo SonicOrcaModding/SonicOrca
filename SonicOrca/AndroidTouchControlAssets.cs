@@ -10,7 +10,7 @@ namespace SonicOrca;
 
 public static class AndroidTouchControlAssets
 {
-#if __ANDROID__
+#if __ANDROID__ || __IOS__
     private static bool _loaded;
     private static bool _available;
     private static bool _started;
@@ -34,7 +34,9 @@ public static class AndroidTouchControlAssets
 
     private static void Log(string message)
     {
+#if __ANDROID__
         try { global::Android.Util.Log.Info(LogTag, message); } catch { }
+#endif
         try { Trace.WriteLine(message); } catch { }
     }
 
@@ -187,6 +189,12 @@ public static class AndroidTouchControlAssets
     }
 
 #else
+    public static bool Available => false;
+    public static ITexture DpadBottom => null;
+    public static ITexture DpadTop => null;
+    public static ITexture ButtonMain => null;
+    public static ITexture ButtonMainAlt => null;
+    public static ITexture ButtonBack => null;
     public static void EnsureLoaded(SonicOrcaGameContext gameContext) { }
     public static void Preload(SonicOrcaGameContext gameContext) { }
 #endif
