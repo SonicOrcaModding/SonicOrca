@@ -65,7 +65,7 @@ namespace SonicOrca.Core
         "SONICORCA/OBJECTS/KNUCKLES"
       };
       private const double EarthquakeFadeAmount = 0.011111111111111112;
-#if __ANDROID__
+#if __ANDROID__ || __IOS__
       private const double TouchDpadXFactor = 48.0 / 320.0;
       private const double TouchDpadYFactor = 192.0 / 240.0;
       private const double TouchLeftZoneXFactor = 96.0 / 320.0;
@@ -663,7 +663,7 @@ namespace SonicOrca.Core
         this._camera.Draw(renderer);
         if (this.ShowHUD)
           this._hud.Draw(renderer);
-#if __ANDROID__
+#if __ANDROID__ || __IOS__
         this.DrawTouchControls(renderer);
 #endif
         if ((this.StateFlags & LevelStateFlags.CompletingStage) != 0)
@@ -678,7 +678,7 @@ namespace SonicOrca.Core
         this._fadeTransitionRenderer.Render();
       }
 
-#if __ANDROID__
+#if __ANDROID__ || __IOS__
       private void DrawTouchControls(Renderer renderer)
       {
         if ((this.StateFlags & LevelStateFlags.AllowCharacterControl) == 0)

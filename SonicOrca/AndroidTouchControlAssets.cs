@@ -64,7 +64,7 @@ public static class AndroidTouchControlAssets
         return null;
     }
 
-    public static void EnsureLoaded(SonicOrcaGameContext gameContext) { }
+    public static void EnsureLoaded(SonicOrcaGameContext gameContext) => Preload(gameContext);
 
     public static void Preload(SonicOrcaGameContext gameContext)
     {
