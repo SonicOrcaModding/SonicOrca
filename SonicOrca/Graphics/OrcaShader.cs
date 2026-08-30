@@ -35,7 +35,7 @@ namespace SonicOrca.Graphics
       private static string ParseShaderFileWithIncludes(string path)
       {
         if (!File.Exists(path))
-          path = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), path);
+          path = Path.Combine(AppContext.BaseDirectory, path);
         StringBuilder stringBuilder = new StringBuilder();
         StreamReader streamReader = new StreamReader(path);
         string str1;

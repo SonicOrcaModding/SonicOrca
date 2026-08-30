@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>$(SonicOrcaTargetFramework)</TargetFramework>
     <AssemblyName>SonicOrca</AssemblyName>
     <LangVersion>12</LangVersion>
     <Nullable>disable</Nullable>
@@ -19,8 +19,12 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.CodeDom" Version="8.0.0" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(Platform)' != 'Switch'">
     <ProjectReference Include="..\SonicOrca.Common\SonicOrca.Common.csproj" />
     <ProjectReference Include="..\SonicOrca.Resources\SonicOrca.Resources.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Platform)' == 'Switch'">
+    <Reference Include="SonicOrca.Common" HintPath="..\SonicOrca.Common\bin\Switch\$(Configuration)\SonicOrca.Common.dll" />
+    <Reference Include="SonicOrca.Resources" HintPath="..\SonicOrca.Resources\bin\Switch\$(Configuration)\SonicOrca.Resources.dll" />
   </ItemGroup>
 </Project>

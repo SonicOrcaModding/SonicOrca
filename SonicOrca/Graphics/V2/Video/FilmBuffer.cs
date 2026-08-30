@@ -56,16 +56,28 @@ namespace SonicOrca.Graphics.V2.Video
 
       public void OnLoaded()
       {
+#if MONO_NX
+        this._width = 1;
+        this._height = 1;
+        this._bytes = new byte[4];
+        this._currentFrame = 0.0;
+        this._numFrames = 0.0;
+        this._frameRate = 30.0;
+#else
         this.TryProbeVideoInfo();
         int num = this._width * this._height * 4;
         this._bytes = num > 0 ? new byte[num] : Array.Empty<byte>();
         this._currentFrame = 0.0;
+#endif
       }
 
       public FilmBuffer(string path) => this._path = path;
 
       public void Decode()
       {
+#if MONO_NX
+        return;
+#else
         if (this._width <= 0 || this._height <= 0 || this._bytes.Length == 0)
           return;
         if (!this.EnsureFfmpegStarted())
@@ -76,6 +88,7 @@ namespace SonicOrca.Graphics.V2.Video
           return;
         }
         ++this._currentFrame;
+#endif
       }
 
       public byte[] GetArgbData()
@@ -85,6 +98,9 @@ namespace SonicOrca.Graphics.V2.Video
 
       private bool EnsureFfmpegStarted()
       {
+#if MONO_NX
+        return false;
+#else
         if (this._ffmpegProcess != null && !this._ffmpegProcess.HasExited && this._ffmpegStdout != null)
           return true;
         this.Dispose();
@@ -108,6 +124,7 @@ namespace SonicOrca.Graphics.V2.Video
           Console.WriteLine("Failed to start ffmpeg for video playback: " + ex.Message);
           return false;
         }
+#endif
       }
 
       private bool ReadExact(byte[] buffer, int count)
@@ -127,6 +144,9 @@ namespace SonicOrca.Graphics.V2.Video
 
       private void TryProbeVideoInfo()
       {
+#if MONO_NX
+        return;
+#else
         ProcessStartInfo processStartInfo = new ProcessStartInfo("ffprobe", "-v error -select_streams v:0 -show_entries stream=width,height,r_frame_rate,nb_frames,duration -of default=nokey=1:noprint_wrappers=1 \"" + this._path + "\"")
         {
           RedirectStandardOutput = true,
@@ -161,6 +181,7 @@ namespace SonicOrca.Graphics.V2.Video
         {
           Console.WriteLine("Failed to probe video metadata: " + ex.Message);
         }
+#endif
       }
 
       private double ParseFrameRate(string value)

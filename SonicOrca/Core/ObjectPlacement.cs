@@ -232,6 +232,12 @@ namespace SonicOrca.Core
       {
         if (behaviour.GetType() == typeof (ExpandoObject))
           return (IEnumerable<KeyValuePair<string, object>>) (behaviour as IDictionary<string, object>);
+#if MONO_NX
+        return behaviour.GetType()
+          .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+          .Select<PropertyInfo, KeyValuePair<string, object>>((Func<PropertyInfo, KeyValuePair<string, object>>) (property => new KeyValuePair<string, object>(property.Name, property.GetValue(behaviour, null))))
+          .ToArray<KeyValuePair<string, object>>();
+#else
         Dictionary<string, object> keyPairs = new Dictionary<string, object>();
         foreach (PropertyDescriptor property in TypeDescriptor.GetProperties(behaviour))
         {
@@ -239,6 +245,7 @@ namespace SonicOrca.Core
           keyPairs.Add(property.Name, obj);
         }
         return (IEnumerable<KeyValuePair<string, object>>) keyPairs;
+#endif
       }
     }
 }

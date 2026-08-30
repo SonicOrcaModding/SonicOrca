@@ -309,7 +309,7 @@ namespace csvorbis
       private int make_decode_ready()
       {
         if (this.decode_ready)
-          Environment.Exit(1);
+          throw new InvalidOperationException("Vorbis decoder is already ready");
         this.vd.synthesis_init(this.vi[0]);
         this.vb.init(this.vd);
         this.decode_ready = true;

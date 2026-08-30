@@ -23,6 +23,9 @@ namespace SonicOrca.Core
           string useNamespace = ScriptImport.ReadToWhitespace(sourceCode.Substring(5));
           return ((IEnumerable<Assembly>) AppDomain.CurrentDomain.GetAssemblies()).SelectMany<Assembly, Type>((Func<Assembly, IEnumerable<Type>>) (x => (IEnumerable<Type>) x.GetTypes())).Where<Type>((Func<Type, bool>) (x => x.Namespace == useNamespace)).ToArray<Type>();
         }
+#if MONO_NX
+        throw new PlatformNotSupportedException("Not supported on mono-nx.");
+#else
         IReadOnlyList<string> referenceAssemblyNames = (IReadOnlyList<string>) new string[1]
         {
           "SonicOrca"
@@ -34,6 +37,7 @@ namespace SonicOrca.Core
         if (compilerResults.Errors.Count > 0)
           throw new Exception("Compile errors:\n" + string.Join(Environment.NewLine, compilerResults.Errors.OfType<CompilerError>().Select<CompilerError, string>((Func<CompilerError, string>) (x => $"  Line {x.Line}, {x.ErrorText}"))));
         return compilerResults.CompiledAssembly.GetTypes();
+#endif
       }
 
       private static string ReadToWhitespace(string input)
